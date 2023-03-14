@@ -1,5 +1,4 @@
 import marshmallow as mar
-import marshmallow.fields
 from marshmallow import EXCLUDE
 from marshmallow.validate import Length
 from marshmallow_sqlalchemy import field_for
