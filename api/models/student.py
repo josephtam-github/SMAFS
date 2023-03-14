@@ -8,7 +8,7 @@ class Student(db.Model):
     lastname = db.Column(db.String(45), nullable=False)
     email = db.Column(db.String(50), nullable=False, unique=True)
     password_hash = db.Column(db.Text(), nullable=False)
-    is_staff = db.Column(db.Boolean(), default=False)
+    is_admin = db.Column(db.Boolean(), default=False)
 
     def __repr__(self):
         return f"<Student {self.student_id}>"
