@@ -1,9 +1,10 @@
-import marshmallow as ma
+import marshmallow as mar
 import marshmallow.fields
 from marshmallow import EXCLUDE
 from marshmallow.validate import Length
 from marshmallow_sqlalchemy import field_for
 from ..models.student import Student
+from api import ma
 from ..models.course import Course
 from ..models.record import Record
 
@@ -14,7 +15,7 @@ class StudentSchema(ma.SQLAlchemySchema):
         ordered = True
         unknown = EXCLUDE
 
-    student_id = field_for(Student, "id", dump_only=True)
+    student_id = field_for(Student, "student_id", dump_only=True)
     firstname = field_for(Student, "firstname", required=True, validate=Length(min=2, max=45))
     lastname = field_for(Student, "lastname", required=True, validate=Length(min=2, max=45))
     email = field_for(Student, "email", required=True, validate=Length(min=5, max=50))
@@ -35,8 +36,8 @@ class StudentQueryArgsSchema(mar.Schema):
         unknown = EXCLUDE
         ordered = True
 
-    student_id = marshmallow.fields.Integer()
-    firstname = ma.fields.String(validate=Length(min=2, max=45))
-    lastname = ma.fields.String(validate=Length(min=2, max=45))
-    email = ma.fields.String(validate=Length(min=2, max=50))
-    is_staff = ma.fields.Boolean()
+    student_id = mar.fields.Integer()
+    firstname = mar.fields.String(validate=Length(min=2, max=45))
+    lastname = mar.fields.String(validate=Length(min=2, max=45))
+    email = mar.fields.String(validate=Length(min=2, max=50))
+    is_staff = mar.fields.Boolean()
