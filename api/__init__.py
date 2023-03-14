@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_smorest import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 import os
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -14,6 +15,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, db
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 
 # Api configuration
 app.config["API_TITLE"] = "My API"
