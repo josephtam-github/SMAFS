@@ -18,7 +18,7 @@ class StudentSchema(ma.SQLAlchemySchema):
     firstname = field_for(Student, "firstname", required=True, validate=Length(min=2, max=45))
     lastname = field_for(Student, "lastname", required=True, validate=Length(min=2, max=45))
     email = field_for(Student, "email", required=True, validate=Length(min=5, max=50))
-    is_admin = field_for(Student, "is_staff", dump_only=True)
+    is_admin = field_for(Student, "is_admin", dump_only=True)
     password = field_for(Student, "password_hash", required=True)
 
     def update(self, obj, data):
@@ -33,10 +33,17 @@ class StudentSchema(ma.SQLAlchemySchema):
 class StudentQueryArgsSchema(mar.Schema):
     class Meta:
         unknown = EXCLUDE
-        ordered = True
 
     student_id = mar.fields.Integer()
     firstname = mar.fields.String(validate=Length(min=2, max=45))
     lastname = mar.fields.String(validate=Length(min=2, max=45))
     email = mar.fields.String(validate=Length(min=2, max=50))
     is_admin = mar.fields.Boolean()
+
+
+class LoginQueryArgsSchema(mar.Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    email = mar.fields.String(required=True, validate=Length(min=2, max=50))
+    password = mar.fields.String(required=True)
