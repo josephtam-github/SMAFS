@@ -64,9 +64,19 @@ class Logout(MethodView):
     @auth.response(HTTPStatus.OK, description='Returns success message')
     @jwt_required()
     def post(self):
-        """
-            Log the User Out
-        """
+        """Log the User Out"""
         unset_jwt_cookies
         db.session.commit()
         return {"message": "Logout successful"}, HTTPStatus.OK
+
+
+@auth.route('/refresh')
+class Refresh(MethodView):
+    @auth.response(HTTPStatus.OK, description='Returns a new access token')
+    @jwt_required(refresh=True)
+    def post(self):
+        """Generate Refresh Token"""
+        student_id = get_jwt_identity()
+        access_token = create_access_token(identity=student_id)
+        return jsonify({'access_token': access_token}), HTTPStatus.OK
+
