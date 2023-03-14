@@ -6,6 +6,7 @@ from ..models.schema import StudentSchema, LoginQueryArgsSchema
 from http import HTTPStatus
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
+from api import db
 
 auth = Blueprint(
     'Auth',
@@ -18,7 +19,7 @@ auth = Blueprint(
 @auth.route('/signup')
 class Register(MethodView):
     @auth.arguments(StudentSchema)
-    @auth.response(201, StudentSchema)
+    @auth.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing ')
     def post(self, new_data):
         """Register a new student"""
 
@@ -36,7 +37,7 @@ class Register(MethodView):
 @auth.route('/login')
 class Login(MethodView):
     @auth.arguments(LoginQueryArgsSchema)
-    @auth.response(201, LoginQueryArgsSchema)
+    @auth.response(HTTPStatus.CREATED, LoginQueryArgsSchema, description='Returns the access and return tokens')
     def post(self, login_data):
         """Logs in student"""
 
@@ -57,3 +58,15 @@ class Login(MethodView):
         else:
             abort(HTTPStatus.UNAUTHORIZED, message='Invalid credentials')
 
+
+@auth.route('/logout')
+class Logout(MethodView):
+    @auth.response(HTTPStatus.OK, description='Returns success message')
+    @jwt_required()
+    def post(self):
+        """
+            Log the User Out
+        """
+        unset_jwt_cookies
+        db.session.commit()
+        return {"message": "Logout successful"}, HTTPStatus.OK
