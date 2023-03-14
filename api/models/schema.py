@@ -18,8 +18,8 @@ class StudentSchema(ma.SQLAlchemySchema):
     firstname = field_for(Student, "firstname", required=True, validate=Length(min=2, max=45))
     lastname = field_for(Student, "lastname", required=True, validate=Length(min=2, max=45))
     email = field_for(Student, "email", required=True, validate=Length(min=5, max=50))
-    is_staff = field_for(Student, "is_staff", required=True)
-    password_hash = field_for(Student, "password_hash", dump_only=True)
+    is_staff = field_for(Student, "is_staff", dump_only=True)
+    password = field_for(Student, "password_hash", required=True)
 
     def update(self, obj, data):
         """Update object nullifying missing data"""
