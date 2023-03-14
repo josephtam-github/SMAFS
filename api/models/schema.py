@@ -1,4 +1,5 @@
 import marshmallow as ma
+import marshmallow.fields
 from marshmallow import EXCLUDE
 from marshmallow.validate import Length
 from marshmallow_sqlalchemy import field_for
@@ -34,7 +35,8 @@ class StudentQueryArgsSchema(mar.Schema):
         unknown = EXCLUDE
         ordered = True
 
-    firstname = mar.fields.String(validate=Length(min=2, max=45))
-    lastname = mar.fields.String(validate=Length(min=2, max=45))
-    email = mar.fields.String(validate=Length(min=2, max=50))
-    is_staff = mar.fields.Boolean()
+    student_id = marshmallow.fields.Integer()
+    firstname = ma.fields.String(validate=Length(min=2, max=45))
+    lastname = ma.fields.String(validate=Length(min=2, max=45))
+    email = ma.fields.String(validate=Length(min=2, max=50))
+    is_staff = ma.fields.Boolean()
