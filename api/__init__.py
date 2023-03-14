@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_smorest import Api
+from flask_smorest import Api, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os
@@ -22,3 +22,6 @@ app.config["API_TITLE"] = "My API"
 app.config["API_VERSION"] = "v1"
 app.config["OPENAPI_VERSION"] = "3.0.2"
 api = Api(app)
+
+from .auth.views import auth
+api.register_blueprint(auth)
