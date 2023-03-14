@@ -2,9 +2,10 @@ from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from flask_jwt_extended import create_access_token,create_refresh_token, jwt_required, get_jwt_identity, unset_jwt_cookies, decode_token
 from ..models.student import Student
-from ..models.schema import StudentSchema
+from ..models.schema import StudentSchema, LoginQueryArgsSchema
 from http import HTTPStatus
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import jsonify
 
 auth = Blueprint(
     'Auth',
@@ -30,3 +31,29 @@ class Register(MethodView):
         new_student.save()
 
         return new_student, HTTPStatus.OK
+
+
+@auth.route('/login')
+class Login(MethodView):
+    @auth.arguments(LoginQueryArgsSchema)
+    @auth.response(201, LoginQueryArgsSchema)
+    def post(self, login_data):
+        """Logs in student"""
+
+        email = login_data['email']
+        password = login_data['password']
+
+        student = Student.query.filter_by(email=email).first()
+
+        if (student is not None) and check_password_hash(student.password_hash, password):
+            access_token = create_access_token(identity=student.student_id)
+            refresh_token = create_refresh_token(identity=student.student_id)
+            response = {
+                "access_token": access_token,
+                "refresh_token": refresh_token
+            }
+
+            return jsonify(response), HTTPStatus.CREATED
+        else:
+            abort(HTTPStatus.UNAUTHORIZED, message='Invalid credentials')
+
