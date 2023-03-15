@@ -1,6 +1,7 @@
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
-from flask_jwt_extended import create_access_token,create_refresh_token, jwt_required, get_jwt_identity, unset_jwt_cookies, decode_token
+from flask_jwt_extended import create_access_token,create_refresh_token, jwt_required, \
+    get_jwt_identity, unset_jwt_cookies, decode_token, get_jwt
 from ..models.user import User
 from ..models.schema import UserSchema, LoginQueryArgsSchema
 from http import HTTPStatus
@@ -47,8 +48,9 @@ class Login(MethodView):
         user = User.query.filter_by(email=email).first()
 
         if (user is not None) and check_password_hash(user.password_hash, password):
-            access_token = create_access_token(identity=user.user_id)
-            refresh_token = create_refresh_token(identity=user.user_id)
+            additional_claims = {"category": user.category}
+            access_token = create_access_token(identity=user.user_id, additional_claims=additional_claims)
+            refresh_token = create_refresh_token(identity=user.user_id, additional_claims=additional_claims)
             response = {
                 "access_token": access_token,
                 "refresh_token": refresh_token
@@ -65,7 +67,7 @@ class Logout(MethodView):
     @jwt_required()
     def post(self):
         """Log the User Out"""
-        unset_jwt_cookies
+        unset_jwt_cookies()
         db.session.commit()
         return {"message": "Logout successful"}, HTTPStatus.OK
 
@@ -77,6 +79,7 @@ class Refresh(MethodView):
     def post(self):
         """Generate Refresh Token"""
         user_id = get_jwt_identity()
-        access_token = create_access_token(identity=user_id)
+        claims = get_jwt()
+        access_token = create_access_token(identity=user_id, additional_claims=claims)
         return jsonify({'access_token': access_token}), HTTPStatus.OK
 
