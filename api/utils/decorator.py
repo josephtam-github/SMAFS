@@ -10,7 +10,7 @@ def admin_required():
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            if claims["is_admin"]:
+            if claims["category"] == 'ADMIN':
                 return f(*args, **kwargs)
             else:
                 return {"message": "Administrator access required"}, HTTPStatus.FORBIDDEN
