@@ -6,7 +6,7 @@ class Record(db.Model):
 
     student_id = db.Column(db.Integer(), db.ForeignKey("student.student_id"), unique=True, nullable=False)
     course_id = db.Column(db.Integer(), db.ForeignKey("course.course_id"), unique=True, nullable=False)
-    score = db.Column(db.Integer(), nullable=False)
+    score = db.Column(db.Integer(), nullable=True)
 
     __table_args__ = (
         db.PrimaryKeyConstraint(
