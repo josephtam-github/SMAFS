@@ -4,7 +4,7 @@ from api import db
 class Record(db.Model):
     __tablename__ = "record"
 
-    student_id = db.Column(db.Integer(), db.ForeignKey("student.student_id"), unique=True, nullable=False)
+    student_id = db.Column(db.Integer(), db.ForeignKey("user.user_id"), unique=True, nullable=False)
     course_id = db.Column(db.Integer(), db.ForeignKey("course.course_id"), unique=True, nullable=False)
     score = db.Column(db.Integer(), nullable=True)
 

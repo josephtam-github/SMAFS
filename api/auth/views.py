@@ -1,8 +1,8 @@
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from flask_jwt_extended import create_access_token,create_refresh_token, jwt_required, get_jwt_identity, unset_jwt_cookies, decode_token
-from ..models.student import Student
-from ..models.schema import StudentSchema, LoginQueryArgsSchema
+from ..models.user import User
+from ..models.schema import UserSchema, LoginQueryArgsSchema
 from http import HTTPStatus
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
@@ -12,26 +12,26 @@ auth = Blueprint(
     'Auth',
     __name__,
     url_prefix='/auth',
-    description='Authentication for student registration and login with JWT token'
+    description='Authentication for user registration and login with JWT token'
 )
 
 
 @auth.route('/signup')
 class Register(MethodView):
-    @auth.arguments(StudentSchema)
-    @auth.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing ')
+    @auth.arguments(UserSchema)
+    @auth.response(HTTPStatus.OK, UserSchema, description='Returns an object containing ')
     def post(self, new_data):
-        """Register a new student"""
+        """Register a new user"""
 
-        new_student = Student(
+        new_user = User(
             firstname=new_data['firstname'],
             lastname=new_data['lastname'],
             email=new_data['email'],
             password_hash=generate_password_hash(new_data['password'])
         )
-        new_student.save()
+        new_user.save()
 
-        return new_student, HTTPStatus.OK
+        return new_user, HTTPStatus.OK
 
 
 @auth.route('/login')
@@ -39,16 +39,16 @@ class Login(MethodView):
     @auth.arguments(LoginQueryArgsSchema)
     @auth.response(HTTPStatus.CREATED, LoginQueryArgsSchema, description='Returns the access and return tokens')
     def post(self, login_data):
-        """Logs in student"""
+        """Logs in user"""
 
         email = login_data['email']
         password = login_data['password']
 
-        student = Student.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first()
 
-        if (student is not None) and check_password_hash(student.password_hash, password):
-            access_token = create_access_token(identity=student.student_id)
-            refresh_token = create_refresh_token(identity=student.student_id)
+        if (user is not None) and check_password_hash(User.password_hash, password):
+            access_token = create_access_token(identity=User.User_id)
+            refresh_token = create_refresh_token(identity=User.User_id)
             response = {
                 "access_token": access_token,
                 "refresh_token": refresh_token
@@ -76,7 +76,7 @@ class Refresh(MethodView):
     @jwt_required(refresh=True)
     def post(self):
         """Generate Refresh Token"""
-        student_id = get_jwt_identity()
-        access_token = create_access_token(identity=student_id)
+        user_id = get_jwt_identity()
+        access_token = create_access_token(identity=user_id)
         return jsonify({'access_token': access_token}), HTTPStatus.OK
 
