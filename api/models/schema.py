@@ -18,7 +18,7 @@ class UserSchema(ma.SQLAlchemySchema):
     firstname = field_for(User, "firstname", required=True, validate=Length(min=2, max=45))
     lastname = field_for(User, "lastname", required=True, validate=Length(min=2, max=45))
     email = field_for(User, "email", required=True, validate=Length(min=5, max=50))
-    category = field_for(User, "category", dump_only=True)
+    category = field_for(User, "category", required=False)
     password = field_for(User, "password_hash", required=True)
 
     def update(self, obj, data):

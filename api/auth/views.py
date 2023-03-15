@@ -23,12 +23,19 @@ class Register(MethodView):
     @auth.response(HTTPStatus.OK, UserSchema, description='Returns an object containing ')
     def post(self, new_data):
         """Register a new user"""
+        # Sets first user's role to admin
+        is_admin = User.query.all()
+        if is_admin:
+            category = 'STUDENT'
+        else:
+            category = 'ADMIN'
 
         new_user = User(
             firstname=new_data['firstname'],
             lastname=new_data['lastname'],
             email=new_data['email'],
-            password_hash=generate_password_hash(new_data['password'])
+            password_hash=generate_password_hash(new_data['password']),
+            category=category
         )
         new_user.save()
 
