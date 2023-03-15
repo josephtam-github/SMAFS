@@ -46,9 +46,9 @@ class Login(MethodView):
 
         user = User.query.filter_by(email=email).first()
 
-        if (user is not None) and check_password_hash(User.password_hash, password):
-            access_token = create_access_token(identity=User.User_id)
-            refresh_token = create_refresh_token(identity=User.User_id)
+        if (user is not None) and check_password_hash(user.password_hash, password):
+            access_token = create_access_token(identity=user.user_id)
+            refresh_token = create_refresh_token(identity=user.user_id)
             response = {
                 "access_token": access_token,
                 "refresh_token": refresh_token
