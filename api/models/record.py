@@ -1,5 +1,5 @@
 from api import db
-
+from .user import User
 
 class Record(db.Model):
     __tablename__ = "record"
@@ -18,8 +18,11 @@ class Record(db.Model):
         return f"<Score {self.score}>"
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        user = User.query.filter(user_id=self.student_id, category='STUDENT').\
+            first_or_404(description='There is no student with id: {}'.format(self.student_id))
+        if user is not None:
+            db.session.add(self)
+            db.session.commit()
 
     def update(self):
         db.session.commit()
