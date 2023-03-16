@@ -3,6 +3,7 @@ from flask_smorest import Api, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
+from datetime import timedelta
 import os
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -28,6 +29,8 @@ api = Api(app)
 
 # JWT configuration & instantiation
 app.config["JWT_SECRET_KEY"] = os.urandom(24)
+ACCESS_EXPIRES = timedelta(hours=1)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = ACCESS_EXPIRES
 jwt = JWTManager(app)
 
 # Import blueprints at end of file to prevent circular import
