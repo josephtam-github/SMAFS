@@ -17,7 +17,7 @@ auth = Blueprint(
 )
 
 
-@auth.route('/signup')
+@auth.route('/register')
 class Register(MethodView):
     @auth.arguments(UserSchema)
     @auth.response(HTTPStatus.OK, UserSchema, description='Returns an object containing ')
