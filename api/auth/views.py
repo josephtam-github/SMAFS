@@ -3,11 +3,23 @@ from flask.views import MethodView
 from flask_jwt_extended import create_access_token,create_refresh_token, jwt_required, \
     get_jwt_identity, unset_jwt_cookies, decode_token, get_jwt
 from ..models.user import User
+from ..models.blocklist import TokenBlocklist
 from ..models.schema import UserSchema, LoginQueryArgsSchema
 from http import HTTPStatus
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
-from api import db
+from api import db, jwt
+from datetime import datetime, timezone
+
+
+# Callback function to check if a JWT exists in the database blocklist
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
+    jti = jwt_payload["jti"]
+    token = db.session.query(TokenBlocklist.id).filter_by(jti=jti).scalar()
+
+    return token is not None
+
 
 auth = Blueprint(
     'Auth',
@@ -72,9 +84,11 @@ class Login(MethodView):
 class Logout(MethodView):
     @auth.response(HTTPStatus.OK, description='Returns success message')
     @jwt_required()
-    def post(self):
+    def delete(self):
         """Log the User Out"""
-        unset_jwt_cookies()
+        jti = get_jwt()["jti"]
+        now = datetime.now(timezone.utc)
+        db.session.add(TokenBlocklist(jti=jti, created_at=now))
         db.session.commit()
         return {"message": "Logout successful"}, HTTPStatus.OK
 
