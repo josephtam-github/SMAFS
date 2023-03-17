@@ -99,5 +99,5 @@ class RecordSchema(ma.SQLAlchemySchema):
         ordered = False
         unknown = EXCLUDE
 
-    course_id = field_for(Record, "course_id", dump_only=True, validate=Length(min=2, max=45))
-    student_id = field_for(Record, "student_id", dump_only=True, validate=Length(min=2, max=45))
+    course_id = field_for(Record, "course_id", validate=Length(min=2, max=45))
+    student_id = field_for(Record, "student_id", validate=Length(min=2, max=45))
