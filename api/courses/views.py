@@ -1,9 +1,10 @@
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from ..models.user import User
+from ..models.record import Record
 from ..models.course import Course
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..models.schema import CourseSchema
+from ..models.schema import CourseSchema, RecordSchema
 from werkzeug.security import generate_password_hash
 from http import HTTPStatus
 from flask import jsonify
@@ -35,7 +36,7 @@ class Register(MethodView):
         return new_course, HTTPStatus.CREATED
 
 
-@course.route('/<course_id>')
+@course.route('/<int:course_id>')
 class CourseById(MethodView):
     @course.response(HTTPStatus.OK, CourseSchema, description='Returns an object containing requested course data')
     @admin_required()
@@ -97,37 +98,32 @@ class ListCourse(MethodView):
             abort(HTTPStatus.NO_CONTENT, message='There are currently no courses')
 
 
-# # course resource - This is for courses to perform CRUD operations on their accounts
-# @course.route('/')
-# class course(MethodView):
-#     @course.response(HTTPStatus.OK, courseSchema, description='Returns an object containing course\'s own data')
-#     @jwt_required()
-#     def get(self):
-#         """Get a specific course detail"""
-#         course_id = get_jwt_identity()
-#         course_data = Course.query.filter_by(user_id=course_id, category='course').first()
-#
-#         # check if user requested course exist
-#         if course_data is not None:
-#             return course_data, HTTPStatus.CREATED
-#         else:
-#             abort(HTTPStatus.NOT_FOUND, message='course does not exist')
-#
-#     @course.arguments(courseSchema)
-#     @course.response(HTTPStatus.CREATED, courseSchema, description='Returns an object containing course\'s new data')
-#     @jwt_required()
-#     def put(self, update_data):
-#         """Update a specific user detail"""
-#
-#         course_id = get_jwt_identity()
-#         user_to_update = Course.query.filter_by(user_id=course_id).first()
-#
-#         if user_to_update is not None:
-#             user_to_update.firstname = update_data['firstname']
-#             user_to_update.lastname = update_data['lastname']
-#             user_to_update.email = update_data['email']
-#             user_to_update.password_hash = generate_password_hash(update_data['password'])
-#             user_to_update.update()
-#             return user_to_update, HTTPStatus.CREATED
-#         else:
-#             abort(HTTPStatus.NOT_FOUND, message='Course does not exist')
+# Admin resource - Only an admin can register other students
+@course.route('/<int:course_id>/')
+@course.route('/<int:course_id>/<int:student_id>')
+class CourseById(MethodView):
+    @course.response(HTTPStatus.OK, RecordSchema, description='Returns an object containing requested course data')
+    @admin_required()
+    def get(self, course_id, student_id):
+        """Register specified student to specified course"""
+
+        student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
+
+        # check if user requested student exist
+        if student_data is not None:
+            course_data = Course.query.filter_by(course_id=course_id).first()
+            if course_data is not None:
+                record_exist = Record.query.filter_by(course_id=course_id, student_id=student_id).first()
+                if record_exist:
+                    abort(HTTPStatus.NOT_FOUND, message='Student has already been registered')
+                else:
+                    new_record = Record(
+                        course_id=course_id,
+                        student_id=student_id
+                    )
+                    new_record.save()
+                    return new_record, HTTPStatus.CREATED
+            else:
+                abort(HTTPStatus.NOT_FOUND, message='Course does not exist')
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
