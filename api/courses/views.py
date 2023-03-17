@@ -101,7 +101,7 @@ class ListCourse(MethodView):
 # Admin resource - Only an admin can register other students
 @course.route('/<int:course_id>/')
 @course.route('/<int:course_id>/<int:student_id>')
-class CourseById(MethodView):
+class StudentCourseById(MethodView):
     @course.response(HTTPStatus.OK, RecordSchema, description='Returns an object containing requested course data')
     @admin_required()
     def get(self, course_id, student_id):
