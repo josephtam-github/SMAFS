@@ -47,5 +47,28 @@ class LoginQueryArgsSchema(mar.Schema):
     class Meta:
         unknown = EXCLUDE
 
-    email = mar.fields.String(required=True, validate=Length(min=2, max=50))
+    email = mar.fields.String(validate=Length(min=2, max=50))
+    matric_no = mar.fields.String(validate=Length(min=2, max=50))
     password = mar.fields.String(required=True)
+
+
+class StudentSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = User
+        ordered = False
+        unknown = EXCLUDE
+
+    firstname = field_for(User, "firstname", required=True, validate=Length(min=2, max=45))
+    lastname = field_for(User, "lastname", required=True, validate=Length(min=2, max=45))
+    email = field_for(User, "email", required=True, validate=Length(min=5, max=50))
+    category = field_for(User, "category", required=False)
+    password = field_for(User, "password_hash", required=True)
+    matric_no = field_for(User, "matric_no", dump_only=True)
+
+    def update(self, obj, data):
+        """Update object nullifying missing data"""
+        loadable_fields = [
+            k for k, v in self.fields.items() if not v.dump_only
+        ]
+        for name in loadable_fields:
+            setattr(obj, name, data.get(name))
