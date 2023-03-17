@@ -37,6 +37,8 @@ jwt = JWTManager(app)
 from .auth.views import auth
 from .students.views import student
 from .courses.views import course
+from .record.views import record
 api.register_blueprint(auth)
 api.register_blueprint(student)
 api.register_blueprint(course)
+api.register_blueprint(record)
