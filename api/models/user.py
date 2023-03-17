@@ -1,4 +1,5 @@
 from api import db
+import datetime
 
 
 class User(db.Model):
@@ -9,6 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(50), nullable=False, unique=True)
     password_hash = db.Column(db.Text(), nullable=False)
     category = db.Column(db.String(50), default="STUDENT")
+    admitted_on = db.Column(db.DateTime, default=datetime.now())
 
     def __repr__(self):
         return f"<User {self.user_id}>"
