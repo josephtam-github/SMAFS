@@ -91,3 +91,13 @@ class CourseArgsSchema(ma.SQLAlchemySchema):
     name = field_for(Course, "name", required=True, validate=Length(min=2, max=45))
     teacher = field_for(Course, "teacher", required=True, validate=Length(min=5, max=50))
     credit = field_for(Course, "credit", required=True)
+
+
+class RecordSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Course
+        ordered = False
+        unknown = EXCLUDE
+
+    course_id = field_for(Record, "course_id", dump_only=True, validate=Length(min=2, max=45))
+    student_id = field_for(Record, "student_id", dump_only=True, validate=Length(min=2, max=45))
