@@ -43,7 +43,7 @@ class Register(MethodView):
             matric_no = matric(int(last_user.user_id) + 1)
         else:
             category = 'ADMIN'
-            matric_no = 'A/2023/001'
+            matric_no = 'A2023/001'
 
         new_user = User(
             firstname=new_data['firstname'],
