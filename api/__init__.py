@@ -35,4 +35,6 @@ jwt = JWTManager(app)
 
 # Import blueprints at end of file to prevent circular import
 from .auth.views import auth
+from .students.views import student
 api.register_blueprint(auth)
+api.register_blueprint(student)
