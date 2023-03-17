@@ -1,6 +1,7 @@
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
 from functools import wraps
 from http import HTTPStatus
+from flask import jsonify
 
 
 def admin_required():
@@ -13,6 +14,6 @@ def admin_required():
             if claims["category"] == 'ADMIN':
                 return f(*args, **kwargs)
             else:
-                return {"message": "Administrator access required"}, HTTPStatus.FORBIDDEN
+                return jsonify({"message": "Administrator access required"}), HTTPStatus.FORBIDDEN
         return decorator
     return wrapper
