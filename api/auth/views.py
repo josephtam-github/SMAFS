@@ -33,7 +33,7 @@ auth = Blueprint(
 @auth.route('/register')
 class Register(MethodView):
     @auth.arguments(UserSchema)
-    @auth.response(HTTPStatus.CREATED, UserSchema, description='Returns an object containing ')
+    @auth.response(HTTPStatus.CREATED, UserSchema, description='Returns an object containing created user detail')
     def post(self, new_data):
         """Register a new user"""
         # Sets first user's role to admin

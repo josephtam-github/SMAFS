@@ -79,7 +79,7 @@ class ListStudent(MethodView):
 
         # check if user requested student exist
         if student_data is not None:
-            return student_data, HTTPStatus.CREATED
+            return student_data, HTTPStatus.OK
         else:
             abort(HTTPStatus.NO_CONTENT, message='There are currently no students')
 
