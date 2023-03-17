@@ -1,7 +1,7 @@
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from ..models.user import User
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..models.schema import StudentSchema, UserQueryArgsSchema
 from werkzeug.security import generate_password_hash
 from http import HTTPStatus
@@ -52,7 +52,7 @@ class Student(MethodView):
         else:
             abort(HTTPStatus.NOT_FOUND, message='User does not exist')
 
-    @student.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing requested student data')
+    @student.response(HTTPStatus.OK, StudentSchema, description='Returns success message')
     @admin_required()
     def delete(self, student_id):
         """Delete a specific student detail"""
@@ -66,3 +66,38 @@ class Student(MethodView):
         else:
             abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
 
+
+# Student resource - This is for students to perform CRUD operations on their accounts
+@student.route('/')
+class Student(MethodView):
+    @student.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing student\'s own data')
+    @jwt_required()
+    def get(self):
+        """Get a specific student detail"""
+        student_id = get_jwt_identity()
+        student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
+
+        # check if user requested student exist
+        if student_data is not None:
+            return student_data, HTTPStatus.CREATED
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
+
+    @student.arguments(StudentSchema)
+    @student.response(HTTPStatus.CREATED, StudentSchema, description='Returns an object containing student\'s new data')
+    @jwt_required()
+    def put(self, update_data):
+        """Update a specific user detail"""
+
+        student_id = get_jwt_identity()
+        user_to_update = User.query.filter_by(user_id=student_id).first()
+
+        if user_to_update is not None:
+            user_to_update.firstname = update_data['firstname']
+            user_to_update.lastname = update_data['lastname']
+            user_to_update.email = update_data['email']
+            user_to_update.password_hash = generate_password_hash(update_data['password'])
+            user_to_update.update()
+            return user_to_update, HTTPStatus.CREATED
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='User does not exist')
