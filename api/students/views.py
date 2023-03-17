@@ -20,7 +20,7 @@ student = Blueprint(
 # Admin resource - This is because only an admin should
 # have the right to perform CRUD operations on other users
 @student.route('/<student_id>')
-class Student(MethodView):
+class StudentById(MethodView):
     @student.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing requested student data')
     @admin_required()
     def get(self, student_id):
@@ -65,6 +65,23 @@ class Student(MethodView):
             return jsonify({'message': 'Student successfully deleted'}), HTTPStatus.OK
         else:
             abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
+
+
+@student.route('/all')
+class ListStudent(MethodView):
+    @student.response(HTTPStatus.OK, StudentSchema(many=True),
+                      description='Returns an object containing all student data'
+                      )
+    @admin_required()
+    def get(self):
+        """Get a list of all students"""
+        student_data = User.query.filter_by(category='STUDENT').all()
+
+        # check if user requested student exist
+        if student_data is not None:
+            return student_data, HTTPStatus.CREATED
+        else:
+            abort(HTTPStatus.NO_CONTENT, message='There are currently no students')
 
 
 # Student resource - This is for students to perform CRUD operations on their accounts
