@@ -20,7 +20,7 @@ class UserSchema(ma.SQLAlchemySchema):
     email = field_for(User, "email", required=True, validate=Length(min=5, max=50))
     category = field_for(User, "category", required=False)
     password = field_for(User, "password_hash", required=True)
-    admitted_on = field_for(User, "user_id", dump_only=True)
+    matric_no = field_for(User, "matric_no", dump_only=True)
 
     def update(self, obj, data):
         """Update object nullifying missing data"""
@@ -40,7 +40,7 @@ class UserQueryArgsSchema(mar.Schema):
     lastname = mar.fields.String(validate=Length(min=2, max=45))
     email = mar.fields.Email(validate=Length(min=2, max=50))
     category = mar.fields.String(validate=Length(min=2, max=50))
-    admitted_on = mar.fields.DateTime()
+    matric_no = mar.fields.String(validate=Length(min=2, max=50))
 
 
 class LoginQueryArgsSchema(mar.Schema):
