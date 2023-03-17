@@ -22,14 +22,6 @@ class UserSchema(ma.SQLAlchemySchema):
     password = field_for(User, "password_hash", required=True)
     matric_no = field_for(User, "matric_no", dump_only=True)
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
-
 
 class UserQueryArgsSchema(mar.Schema):
     class Meta:
@@ -65,10 +57,14 @@ class StudentSchema(ma.SQLAlchemySchema):
     password = field_for(User, "password_hash", required=True)
     matric_no = field_for(User, "matric_no", dump_only=True)
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
+
+class StudentUpdateSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = User
+        ordered = False
+        unknown = EXCLUDE
+
+    firstname = field_for(User, "firstname", required=True, validate=Length(min=2, max=45))
+    lastname = field_for(User, "lastname", required=True, validate=Length(min=2, max=45))
+    email = field_for(User, "email", required=True, validate=Length(min=5, max=50))
+    password = field_for(User, "password_hash", required=True)
