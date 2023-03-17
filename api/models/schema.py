@@ -68,3 +68,26 @@ class StudentUpdateSchema(ma.SQLAlchemySchema):
     lastname = field_for(User, "lastname", required=True, validate=Length(min=2, max=45))
     email = field_for(User, "email", required=True, validate=Length(min=5, max=50))
     password = field_for(User, "password_hash", required=True)
+
+
+class CourseSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Course
+        ordered = False
+        unknown = EXCLUDE
+
+    course_id = field_for(Course, "course_id", dump_only=True, validate=Length(min=2, max=45))
+    name = field_for(Course, "name", required=True, validate=Length(min=2, max=45))
+    teacher = field_for(Course, "teacher", required=True, validate=Length(min=5, max=50))
+    credit = field_for(Course, "credit", required=True)
+
+
+class CourseArgsSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Course
+        ordered = False
+        unknown = EXCLUDE
+
+    name = field_for(Course, "name", required=True, validate=Length(min=2, max=45))
+    teacher = field_for(Course, "teacher", required=True, validate=Length(min=5, max=50))
+    credit = field_for(Course, "credit", required=True)
