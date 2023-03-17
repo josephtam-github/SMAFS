@@ -10,6 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
 from api import db, jwt
 from datetime import datetime, timezone
+from ..utils.matriculator import matric
 
 
 # Callback function to check if a JWT exists in the database blocklist
@@ -36,18 +37,21 @@ class Register(MethodView):
     def post(self, new_data):
         """Register a new user"""
         # Sets first user's role to admin
-        is_admin = User.query.all()
-        if is_admin:
+        last_user = User.query.order_by(User.user_id.desc()).first()
+        if last_user:
             category = 'STUDENT'
+            matric_no = matric(int(last_user.user_id) + 1)
         else:
             category = 'ADMIN'
+            matric_no = matric(1)
 
         new_user = User(
             firstname=new_data['firstname'],
             lastname=new_data['lastname'],
             email=new_data['email'],
             password_hash=generate_password_hash(new_data['password']),
-            category=category
+            category=category,
+            matric_no=matric_no
         )
         new_user.save()
 
