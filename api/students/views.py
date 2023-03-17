@@ -1,8 +1,10 @@
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from ..models.user import User
+from ..models.course import Course
+from ..models.record import Record
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..models.schema import StudentSchema, UserQueryArgsSchema
+from ..models.schema import StudentSchema, UserQueryArgsSchema, RecordSchema
 from werkzeug.security import generate_password_hash
 from http import HTTPStatus
 from flask import jsonify
@@ -118,3 +120,34 @@ class Student(MethodView):
             return user_to_update, HTTPStatus.CREATED
         else:
             abort(HTTPStatus.NOT_FOUND, message='User does not exist')
+
+
+@student.route('/course/<course_id>')
+class StudentCourseById(MethodView):
+    @student.response(HTTPStatus.OK, RecordSchema, description='Returns an object containing requested '
+                                                               'student and course data')
+    @jwt_required()
+    def get(self, course_id):
+        """Register student user to specified course"""
+
+        student_id = get_jwt_identity()
+        student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
+
+        # check if user requested student exist
+        if student_data is not None:
+            course_data = Course.query.filter_by(course_id=course_id).first()
+            if course_data is not None:
+                record_exist = Record.query.filter_by(course_id=course_id, student_id=student_id).first()
+                if record_exist:
+                    abort(HTTPStatus.NOT_FOUND, message='You have already been registered')
+                else:
+                    new_record = Record(
+                        course_id=course_id,
+                        student_id=student_id
+                    )
+                    new_record.save()
+                    return new_record, HTTPStatus.CREATED
+            else:
+                abort(HTTPStatus.NOT_FOUND, message='Course does not exist')
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
