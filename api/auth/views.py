@@ -1,7 +1,7 @@
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from flask_jwt_extended import create_access_token,create_refresh_token, jwt_required, \
-    get_jwt_identity, unset_jwt_cookies, decode_token, get_jwt
+    get_jwt_identity, get_jwt
 from ..models.user import User
 from ..models.blocklist import TokenBlocklist
 from ..models.schema import UserSchema, LoginQueryArgsSchema
@@ -33,7 +33,7 @@ auth = Blueprint(
 @auth.route('/register')
 class Register(MethodView):
     @auth.arguments(UserSchema)
-    @auth.response(HTTPStatus.OK, UserSchema, description='Returns an object containing ')
+    @auth.response(HTTPStatus.CREATED, UserSchema, description='Returns an object containing ')
     def post(self, new_data):
         """Register a new user"""
         # Sets first user's role to admin
@@ -43,7 +43,7 @@ class Register(MethodView):
             matric_no = matric(int(last_user.user_id) + 1)
         else:
             category = 'ADMIN'
-            matric_no = matric(1)
+            matric_no = 'A/2023/001'
 
         new_user = User(
             firstname=new_data['firstname'],
@@ -55,13 +55,13 @@ class Register(MethodView):
         )
         new_user.save()
 
-        return new_user, HTTPStatus.OK
+        return new_user, HTTPStatus.CREATED
 
 
 @auth.route('/login')
 class Login(MethodView):
     @auth.arguments(LoginQueryArgsSchema)
-    @auth.response(HTTPStatus.CREATED, LoginQueryArgsSchema, description='Returns the access and return tokens')
+    @auth.response(HTTPStatus.ACCEPTED, LoginQueryArgsSchema, description='Returns the access and return tokens')
     def post(self, login_data):
         """Logs in user"""
 
@@ -86,7 +86,7 @@ class Login(MethodView):
                 "refresh_token": refresh_token
             }
 
-            return jsonify(response), HTTPStatus.CREATED
+            return jsonify(response), HTTPStatus.ACCEPTED
         else:
             abort(HTTPStatus.UNAUTHORIZED, message='Invalid credentials')
 
