@@ -1,11 +1,13 @@
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from ..models.user import User
+from flask_jwt_extended import jwt_required
 from ..models.schema import StudentSchema, UserQueryArgsSchema
+from werkzeug.security import generate_password_hash
 from http import HTTPStatus
 from flask import jsonify
 from api import db
-from ..utils.matriculator import matric, dematric
+from ..utils.decorator import admin_required
 
 student = Blueprint(
     'Student',
@@ -15,17 +17,52 @@ student = Blueprint(
 )
 
 
+# Admin resource - This is because only an admin should
+# have the right to perform CRUD operations on other users
 @student.route('/<student_id>')
 class Student(MethodView):
     @student.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing requested student data')
+    @admin_required()
     def get(self, student_id):
-        """Get specific student detail"""
+        """Get a specific student detail"""
 
         student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
 
         # check if user requested student exist
         if student_data is not None:
             return student_data, HTTPStatus.CREATED
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
+
+    @student.arguments(StudentSchema)
+    @student.response(HTTPStatus.CREATED, StudentSchema, description='Returns an object containing updated student data')
+    @admin_required()
+    def put(self, update_data, student_id):
+        """Update a specific user detail"""
+
+        user_to_update = User.query.filter_by(user_id=student_id).first()
+
+        if user_to_update is not None:
+            user_to_update.firstname = update_data['firstname']
+            user_to_update.lastname = update_data['lastname']
+            user_to_update.email = update_data['email']
+            user_to_update.password_hash = generate_password_hash(update_data['password'])
+            user_to_update.update()
+            return user_to_update, HTTPStatus.CREATED
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='User does not exist')
+
+    @student.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing requested student data')
+    @admin_required()
+    def delete(self, student_id):
+        """Delete a specific student detail"""
+
+        student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
+
+        # check if user requested student exist
+        if student_data is not None:
+            student_data.delete()
+            return jsonify({'message': 'Student successfully deleted'}), HTTPStatus.OK
         else:
             abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
 
