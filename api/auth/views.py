@@ -65,10 +65,17 @@ class Login(MethodView):
     def post(self, login_data):
         """Logs in user"""
 
-        email = login_data['email']
-        password = login_data['password']
+        if 'email' in login_data.keys():
+            email = login_data['email']
+            user = User.query.filter_by(email=email).first()
 
-        user = User.query.filter_by(email=email).first()
+        elif 'matric_no' in login_data.keys():
+            matric_no = login_data['matric_no']
+            user = User.query.filter_by(matric_no=matric_no).first()
+        else:
+            abort(HTTPStatus.BAD_REQUEST, message='You must input either your matriculation number or your email '
+                                                  'along with your password')
+        password = login_data['password']
 
         if (user is not None) and check_password_hash(user.password_hash, password):
             additional_claims = {"category": user.category}
