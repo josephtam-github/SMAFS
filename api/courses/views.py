@@ -28,7 +28,7 @@ class Register(MethodView):
     def post(self, new_data):
         """Register a new course"""
 
-        name_exist = User.query.filter_by(name=new_data['name'].upper()).first()
+        name_exist = Course.query.filter_by(name=new_data['name'].upper()).first()
         if name_exist:
             abort(HTTPStatus.NOT_ACCEPTABLE, message='This name already exists')
 
@@ -92,7 +92,7 @@ class CourseById(MethodView):
 
 @course.route('/<int:course_id>/student/<int:student_id>')
 class StudentCourseById(MethodView):
-    @course.response(HTTPStatus.OK, RecordSchema, description='Returns an object containing requested course data')
+    @course.response(HTTPStatus.CREATED, RecordSchema, description='Returns an object containing requested course data')
     @admin_required()
     def get(self, course_id, student_id):
         """Register specified student to specified course"""
@@ -157,6 +157,6 @@ class CourseById(MethodView):
                     'credit': course_detail.credit
                 }
                 result.append(result_dict)
-            return jsonify(result), HTTPStatus.CREATED
+            return jsonify(result), HTTPStatus.OK
         else:
             abort(HTTPStatus.NOT_FOUND, message='You have not been registered for any course')
