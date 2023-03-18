@@ -94,7 +94,7 @@ class AddStudentCourseScoreById(MethodView):
     @record.response(HTTPStatus.CREATED, ScoreArgsSchema, description='Returns an object containing'
                                                                       ' students course data with new score')
     @admin_required()
-    def put(self, course_id, student_id, score):
+    def get(self, course_id, student_id, score):
         """Add score to specified student, who has been registered for the specified course"""
         if 0 >= score <= 100:
             abort(HTTPStatus.BAD_REQUEST, message='Score must be greater than or equal to 0'
