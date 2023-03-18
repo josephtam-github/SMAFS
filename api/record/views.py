@@ -38,8 +38,11 @@ class GetStudentsOnCourse(MethodView):
                 result = []
                 for student in students:
                     student_data = User.query.filter_by(user_id=student.student_id).first()
-                    result_dict = {'firstname': student_data.firstname, 'lastname': student_data.lastname,
-                                   'email': student_data.email, 'matric_no': student_data.matric_no}
+                    result_dict = {'firstname': student_data.firstname,
+                                   'lastname': student_data.lastname,
+                                   'email': student_data.email,
+                                   'matric_no': student_data.matric_no
+                                   }
 
                     result.append(result_dict)
                 return jsonify(result), HTTPStatus.OK
