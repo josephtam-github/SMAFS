@@ -25,7 +25,10 @@ class Register(MethodView):
     @auth.arguments(UserSchema)
     @auth.response(HTTPStatus.CREATED, UserSchema, description='Returns an object containing created user detail')
     def post(self, new_data):
-        """Register a new user"""
+        """Register a new user
+
+        Returns the new user info from the database
+        """
         # Sets first user's role to admin
         last_user = User.query.order_by(User.user_id.desc()).first()
         if last_user:
@@ -56,7 +59,10 @@ class Login(MethodView):
     @auth.arguments(LoginQueryArgsSchema)
     @auth.response(HTTPStatus.ACCEPTED, LoginQueryArgsSchema, description='Returns the access and return tokens')
     def post(self, login_data):
-        """Logs in user"""
+        """Logs in user
+
+        Returns access and refresh tokens
+        """
 
         if 'email' in login_data.keys():
             email = login_data['email']
@@ -89,7 +95,10 @@ class Logout(MethodView):
     @auth.response(HTTPStatus.OK, description='Returns success message')
     @jwt_required()
     def delete(self):
-        """Log the User Out"""
+        """Log the User Out
+
+        Returns success message
+        """
         jti = get_jwt()["jti"]
         now = datetime.now(timezone.utc)
         blocked_token = TokenBlocklist(jti=jti, created_at=now)
@@ -102,7 +111,10 @@ class Refresh(MethodView):
     @auth.response(HTTPStatus.OK, description='Returns a new access token')
     @jwt_required(refresh=True)
     def post(self):
-        """Generate Refresh Token"""
+        """Generate Refresh Token
+
+        Returns new access token
+        """
         user_id = get_jwt_identity()
         claims = get_jwt()
         access_token = create_access_token(identity=user_id, additional_claims=claims)

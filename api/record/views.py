@@ -29,7 +29,10 @@ class GetStudentsOnCourse(MethodView):
                                                                ' all students registered to a course')
     @admin_required()
     def get(self, course_id):
-        """Get a list of all students that registered for the course"""
+        """Get a list of all students that registered for the course - Admin only
+
+        Returns a list of objects containing students offering a particular course
+        """
         course_exist = Course.query.filter_by(course_id=course_id).first()
 
         if course_exist:
@@ -59,7 +62,10 @@ class GetStudentCourseScore(MethodView):
                                                              ' students score in a course')
     @jwt_required()
     def get(self, course_id):
-        """Get students score for a specified course"""
+        """Get students score for a specified course
+
+        Returns student score for specified course along with course detail
+        """
         course_exist = Course.query.filter_by(course_id=course_id).first()
         student_id = get_jwt_identity()
 
@@ -95,7 +101,10 @@ class AddStudentCourseScoreById(MethodView):
                                                                       ' students course data with new score')
     @admin_required()
     def get(self, course_id, student_id, score):
-        """Add score to specified student, who has been registered for the specified course"""
+        """Add score to specified student, who has been registered for the specified course - Admin only
+
+        Returns detail about student, course and score
+        """
         if 0 >= score <= 100:
             abort(HTTPStatus.BAD_REQUEST, message='Score must be greater than or equal to 0'
                                                   ' and less than or equal to 100')
@@ -135,7 +144,10 @@ class GetStudentCourseScoreById(MethodView):
                                                                  ' student\'s score in a course')
     @admin_required()
     def get(self, course_id, student_id):
-        """Get a specified students score for a specified course"""
+        """Get a specified students score for a specified course - Admin only
+
+        Returns student score and course detail
+        """
         course_exist = Course.query.filter_by(course_id=course_id).first()
 
         if course_exist:
@@ -172,7 +184,10 @@ class GetStudentCourseScore(MethodView):
                                                              ' students CGPA of all courses')
     @jwt_required()
     def get(self):
-        """Get students CGPA for all courses"""
+        """Get students CGPA for all courses
+
+        Returns students CGPA in a 4.0 scale
+        """
         student_id = get_jwt_identity()
         course_exist = Record.query.filter_by(student_id=student_id).all()
 

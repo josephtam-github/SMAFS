@@ -26,7 +26,10 @@ class Register(MethodView):
     @course.response(HTTPStatus.CREATED, CourseSchema, description='Returns an object containing created course detail')
     @admin_required()
     def post(self, new_data):
-        """Register a new course"""
+        """Register a new course - Admin only
+
+        Returns the details of the new course from database
+        """
 
         name_exist = Course.query.filter_by(name=new_data['name'].upper()).first()
         if name_exist:
@@ -47,7 +50,10 @@ class CourseById(MethodView):
     @course.response(HTTPStatus.OK, CourseSchema, description='Returns an object containing requested course data')
     @admin_required()
     def get(self, course_id):
-        """Get a specific course detail"""
+        """Get a specific course detail - Admin only
+
+        Returns the course's detail as a list of objects
+        """
 
         course_data = Course.query.filter_by(course_id=course_id).first()
 
@@ -61,7 +67,10 @@ class CourseById(MethodView):
     @course.response(HTTPStatus.CREATED, CourseSchema, description='Returns an object containing updated course data')
     @admin_required()
     def put(self, update_data, course_id):
-        """Update a specific course detail"""
+        """Update a specific course detail - Admin only
+
+        Returns the updated course detail from database
+        """
 
         course_to_update = Course.query.filter_by(course_id=course_id).first()
 
@@ -78,7 +87,10 @@ class CourseById(MethodView):
     @course.response(HTTPStatus.OK, CourseSchema, description='Returns success message')
     @admin_required()
     def delete(self, course_id):
-        """Delete a specific course detail"""
+        """Delete a specific course detail - Admin only
+
+        Returns a message upon successful deletion
+        """
 
         course_data = Course.query.filter_by(course_id=course_id).first()
 
@@ -95,7 +107,10 @@ class StudentCourseById(MethodView):
     @course.response(HTTPStatus.CREATED, RecordSchema, description='Returns an object containing requested course data')
     @admin_required()
     def get(self, course_id, student_id):
-        """Register specified student to specified course"""
+        """Register specified student to specified course - Admin only
+
+        Returns the course and user id, the score for the course is set to null.
+        """
 
         student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
 
@@ -125,7 +140,10 @@ class ListCourse(MethodView):
     @course.response(HTTPStatus.OK, CourseSchema(many=True), description='Returns an object containing all course data')
     @jwt_required()
     def get(self):
-        """Get a list of all courses"""
+        """Get a list of all courses
+
+        Returns all registered courses
+        """
         course_data = Course.query.all()
 
         # check if user requested course exist
@@ -141,7 +159,10 @@ class CourseById(MethodView):
                                                               ' of all offered course')
     @jwt_required()
     def get(self):
-        """Get detail of all courses being offered"""
+        """Get detail of all courses being offered
+
+        Returns all the courses offered as a list of objects
+        """
         student_id = get_jwt_identity()
         course_data = Record.query.filter_by(student_id=student_id).all()
 

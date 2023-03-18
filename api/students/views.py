@@ -26,7 +26,7 @@ class StudentById(MethodView):
     @student.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing requested student data')
     @admin_required()
     def get(self, student_id):
-        """Get a specific student detail"""
+        """Get a specific student detail - Admin only"""
 
         student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
 
@@ -40,7 +40,10 @@ class StudentById(MethodView):
     @student.response(HTTPStatus.CREATED, StudentSchema, description='Returns an object containing updated student data')
     @admin_required()
     def put(self, update_data, student_id):
-        """Update a specific user detail"""
+        """Update a specific user detail - Admin only
+
+        Returns updated user detail from database
+        """
 
         user_to_update = User.query.filter_by(user_id=student_id).first()
 
@@ -57,7 +60,10 @@ class StudentById(MethodView):
     @student.response(HTTPStatus.OK, StudentSchema, description='Returns success message')
     @admin_required()
     def delete(self, student_id):
-        """Delete a specific student detail"""
+        """Delete a specific student detail - Admin only
+
+        Returns success message
+        """
 
         student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
 
@@ -76,7 +82,10 @@ class ListStudent(MethodView):
                       )
     @admin_required()
     def get(self):
-        """Get a list of all students"""
+        """Get a list of all students - Admin only
+
+        Returns a list of objects containing student detail
+        """
         student_data = User.query.filter_by(category='STUDENT').all()
 
         # check if user requested student exist
@@ -92,7 +101,10 @@ class Student(MethodView):
     @student.response(HTTPStatus.OK, StudentSchema, description='Returns an object containing student\'s own data')
     @jwt_required()
     def get(self):
-        """Get a specific student detail"""
+        """Get a specific student detail
+
+        Returns specific student detail
+        """
         student_id = get_jwt_identity()
         student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
 
@@ -106,7 +118,10 @@ class Student(MethodView):
     @student.response(HTTPStatus.CREATED, StudentSchema, description='Returns an object containing student\'s new data')
     @jwt_required()
     def put(self, update_data):
-        """Update a specific user detail"""
+        """Update a specific user detail
+
+        Returns updated user detail from database
+        """
 
         student_id = get_jwt_identity()
         user_to_update = User.query.filter_by(user_id=student_id).first()
@@ -128,7 +143,10 @@ class StudentCourseById(MethodView):
                                                                'student and course data')
     @jwt_required()
     def get(self, course_id):
-        """Register student user to specified course"""
+        """Register student user to specified course
+
+        Register user who must be a student to specified course
+        """
 
         student_id = get_jwt_identity()
         student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()

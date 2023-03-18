@@ -23,9 +23,10 @@ def create_app(config=config_dict['dev']):
     ma.init_app(app)
     migrate = Migrate(app, db)
 
-    app.config["API_TITLE"] = "My API"
+    app.config["API_TITLE"] = "SMAFS"
     app.config["API_VERSION"] = "v1"
     app.config["OPENAPI_VERSION"] = "3.0.2"
+    app.config['OPENAPI_URL_PREFIX'] = '/docs'
     api = Api(app)
 
     jwt = JWTManager(app)
