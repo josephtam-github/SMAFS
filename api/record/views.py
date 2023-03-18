@@ -11,6 +11,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from api import db
 from ..utils.decorator import admin_required
 from ..utils.grader import letter_grade
+from ..utils.gpa import grade_to_gpa
 
 record = Blueprint(
     'Record',
@@ -125,7 +126,7 @@ class StudentCourseScoreById(MethodView):
             abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
 
     @record.response(HTTPStatus.OK, ScoreArgsSchema, description='Returns an object containing'
-                                                                 ' students score in a course')
+                                                                 ' student\'s score in a course')
     @admin_required()
     def get(self, course_id, student_id):
         """Get a specified students score for a specified course"""
@@ -157,3 +158,28 @@ class StudentCourseScoreById(MethodView):
                 abort(HTTPStatus.NOT_FOUND, message='The student has not been registered for this course')
         else:
             abort(HTTPStatus.NOT_FOUND, message='Course does not exist')
+
+
+@record.route('/cgpa')
+class GetStudentCourseScore(MethodView):
+    @record.response(HTTPStatus.OK, ScoreSchema, description='Returns a message containing'
+                                                             ' students CGPA of all courses')
+    @jwt_required()
+    def get(self):
+        """Get students CGPA for all courses"""
+        student_id = get_jwt_identity()
+        course_exist = Record.query.filter_by(student_id=student_id).all()
+
+        if course_exist:
+            total_gpa = 0
+            course_count = 0
+            for course in course_exist:
+                course_count += 1
+                if course is not Null:
+                    total_gpa += grade_to_gpa(letter_grade(course.score))
+
+            cgpa = total_gpa / course_count
+            cgpa = float("{:.2f}".format(cgpa))
+            return jsonify({"message": f"Your current CGPA is {cgpa}"}), HTTPStatus.OK
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='You have not registered for any course yet')
