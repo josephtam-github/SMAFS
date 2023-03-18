@@ -90,7 +90,7 @@ class GetStudentCourseScore(MethodView):
 
 
 @record.route('/<int:course_id>/student/<int:student_id>/<int:score>')
-class StudentCourseScoreById(MethodView):
+class AddStudentCourseScoreById(MethodView):
     @record.response(HTTPStatus.CREATED, ScoreArgsSchema, description='Returns an object containing'
                                                                       ' students course data with new score')
     @admin_required()
@@ -128,6 +128,9 @@ class StudentCourseScoreById(MethodView):
         else:
             abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
 
+
+@record.route('/<int:course_id>/student/<int:student_id>')
+class GetStudentCourseScoreById(MethodView):
     @record.response(HTTPStatus.OK, ScoreArgsSchema, description='Returns an object containing'
                                                                  ' student\'s score in a course')
     @admin_required()
