@@ -41,6 +41,9 @@ class Register(MethodView):
         if last_user:
             category = 'STUDENT'
             matric_no = matric(int(last_user.user_id) + 1)
+            email_exist = User.query.filter_by(email=new_data['email']).first()
+            if email_exist:
+                abort(HTTPStatus.NOT_ACCEPTABLE, message='This email already exists')
         else:
             category = 'ADMIN'
             matric_no = 'A2023/001'

@@ -27,6 +27,11 @@ class Register(MethodView):
     @admin_required()
     def post(self, new_data):
         """Register a new course"""
+
+        name_exist = User.query.filter_by(name=new_data['name'].upper()).first()
+        if name_exist:
+            abort(HTTPStatus.NOT_ACCEPTABLE, message='This name already exists')
+
         new_course = Course(
             name=new_data['name'].upper(),
             teacher=new_data['teacher'].title(),
