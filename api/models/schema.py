@@ -128,12 +128,3 @@ class ScoreArgsSchema(ma.SQLAlchemySchema):
     matric_no = field_for(User, "matric_no", dump_only=True)
     score = field_for(Record, "score", required=True)
     grade = mar.fields.String()
-
-
-class UpdateScoreArgsSchema(ma.SQLAlchemySchema):
-    class Meta:
-        model = Course
-        ordered = False
-        unknown = EXCLUDE
-
-    score = field_for(Record, "score", required=True, validate=Range(min=0, max=100))
