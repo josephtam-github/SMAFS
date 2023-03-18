@@ -8,18 +8,8 @@ from ..models.schema import UserSchema, LoginQueryArgsSchema
 from http import HTTPStatus
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
-from api import db, jwt
 from datetime import datetime, timezone
 from ..utils.matriculator import matric
-
-
-# Callback function to check if a JWT exists in the database blocklist
-@jwt.token_in_blocklist_loader
-def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
-    jti = jwt_payload["jti"]
-    token = db.session.query(TokenBlocklist.id).filter_by(jti=jti).scalar()
-
-    return token is not None
 
 
 auth = Blueprint(
@@ -102,8 +92,8 @@ class Logout(MethodView):
         """Log the User Out"""
         jti = get_jwt()["jti"]
         now = datetime.now(timezone.utc)
-        db.session.add(TokenBlocklist(jti=jti, created_at=now))
-        db.session.commit()
+        blocked_token = TokenBlocklist(jti=jti, created_at=now)
+        blocked_token.save()
         return {"message": "Logout successful"}, HTTPStatus.OK
 
 
