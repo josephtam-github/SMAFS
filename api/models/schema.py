@@ -1,6 +1,6 @@
 import marshmallow as mar
 from marshmallow import EXCLUDE
-from marshmallow.validate import Length
+from marshmallow.validate import Length, Range
 from marshmallow_sqlalchemy import field_for
 from ..models.user import User
 from api import ma
@@ -101,3 +101,39 @@ class RecordSchema(ma.SQLAlchemySchema):
 
     course_id = field_for(Record, "course_id", validate=Length(min=2, max=45))
     student_id = field_for(Record, "student_id", validate=Length(min=2, max=45))
+
+
+class ScoreSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Course
+        ordered = False
+        unknown = EXCLUDE
+
+    name = field_for(Course, "name", required=True, validate=Length(min=2, max=45))
+    teacher = field_for(Course, "teacher", required=True, validate=Length(min=5, max=50))
+    credit = field_for(Course, "credit", required=True)
+    score = field_for(Record, "score", required=True)
+    grade = mar.fields.String()
+
+
+class ScoreArgsSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Course
+        ordered = False
+        unknown = EXCLUDE
+
+    name = field_for(Course, "name", required=True, validate=Length(min=2, max=45))
+    firstname = field_for(User, "firstname", required=True, validate=Length(min=2, max=45))
+    lastname = field_for(User, "lastname", required=True, validate=Length(min=2, max=45))
+    matric_no = field_for(User, "matric_no", dump_only=True)
+    score = field_for(Record, "score", required=True)
+    grade = mar.fields.String()
+
+
+class UpdateScoreArgsSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Course
+        ordered = False
+        unknown = EXCLUDE
+
+    score = field_for(Record, "score", required=True, validate=Range(min=0, max=100))
