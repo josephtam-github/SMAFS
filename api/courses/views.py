@@ -90,8 +90,7 @@ class CourseById(MethodView):
             abort(HTTPStatus.NOT_FOUND, message='course does not exist')
 
 
-@course.route('/<int:course_id>/')
-@course.route('/<int:course_id>/<int:student_id>')
+@course.route('/<int:course_id>/student/<int:student_id>')
 class StudentCourseById(MethodView):
     @course.response(HTTPStatus.OK, RecordSchema, description='Returns an object containing requested course data')
     @admin_required()

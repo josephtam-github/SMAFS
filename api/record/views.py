@@ -4,7 +4,7 @@ from sqlalchemy import Null
 from ..models.user import User
 from ..models.record import Record
 from ..models.course import Course
-from ..models.schema import RecordSchema, StudentSchema, ScoreSchema, UpdateScoreArgsSchema, ScoreArgsSchema
+from ..models.schema import RecordSchema, StudentSchema, ScoreSchema, ScoreArgsSchema
 from http import HTTPStatus
 from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -89,16 +89,16 @@ class GetStudentCourseScore(MethodView):
             abort(HTTPStatus.NOT_FOUND, message='Course does not exist')
 
 
-@record.route('/<int:course_id>/')
-@record.route('/<int:course_id>/<int:student_id>')
+@record.route('/<int:course_id>/student/<int:student_id>/<int:score>')
 class StudentCourseScoreById(MethodView):
-    @record.arguments(UpdateScoreArgsSchema)
     @record.response(HTTPStatus.CREATED, ScoreArgsSchema, description='Returns an object containing'
                                                                       ' students course data with new score')
     @admin_required()
-    def put(self, score_data, course_id, student_id):
+    def put(self, course_id, student_id, score):
         """Add score to specified student, who has been registered for the specified course"""
-
+        if 0 >= score <= 100:
+            abort(HTTPStatus.BAD_REQUEST, message='Score must be greater than or equal to 0'
+                                                  ' and less than or equal to 100')
         student_data = User.query.filter_by(user_id=student_id, category='STUDENT').first()
 
         # check if user requested student exist
@@ -107,7 +107,7 @@ class StudentCourseScoreById(MethodView):
             if course_data is not None:
                 record_exist = Record.query.filter_by(course_id=course_id, student_id=student_id).first()
                 if record_exist:
-                    record_exist.score = int(score_data['score'])
+                    record_exist.score = score
                     record_exist.save()
 
                     result = []
