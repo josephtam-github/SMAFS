@@ -13,11 +13,10 @@ from .models.course import Course
 from .models.record import Record
 
 
-def create_app(config=config_dict['dev']):
+def create_app(config=config_dict['prod']):
     app = Flask(__name__)
 
     app.config.from_object(config)
-
 
     db.init_app(app)
     ma.init_app(app)
@@ -26,7 +25,16 @@ def create_app(config=config_dict['dev']):
     app.config["API_TITLE"] = "SMAFS"
     app.config["API_VERSION"] = "v1"
     app.config["OPENAPI_VERSION"] = "3.0.2"
-    app.config['OPENAPI_URL_PREFIX'] = '/docs'
+    app.config["API_SPEC_OPTIONS"] = {
+        "description": 'A flask-smorest API that allows a school admin to create accounts and manage student ' \
+                       'data on the web interface powered by PythonAnywhere. The student data may be ' \
+                       'subjected to CRUD operations, and a simple Swagger UI configuration is available for ' \
+                       'testing and integrating with the front end'}
+    app.config['OPENAPI_URL_PREFIX'] = '/'
+    app.config['OPENAPI_JSON_PATH'] = 'api-spec.json'
+    app.config['OPENAPI_SWAGGER_UI_PATH'] = '/'
+    app.config['OPENAPI_SWAGGER_UI_URL'] = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.25.x/'
+
     api = Api(app)
 
     jwt = JWTManager(app)

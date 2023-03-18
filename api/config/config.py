@@ -5,12 +5,12 @@ from datetime import timedelta
 
 # SQLAlchemy configuration & instantiation
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+db_name = 'smafs.db'
 
-uri = os.environ.get('DATABASE_URL')  # or other relevant config var
+default_uri = "postgres://{}:{}@{}/{}".format('postgres', 'password', 'localhost:5432', db_name)
+uri = os.environ.get('DATABASE_URL', default_uri)  # or other relevant config var
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
-
-db_name = 'smafs.db'
 
 
 class Config:
