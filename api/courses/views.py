@@ -129,3 +129,30 @@ class ListCourse(MethodView):
             return course_data, HTTPStatus.OK
         else:
             abort(HTTPStatus.NOT_FOUND, message='There are currently no courses')
+
+
+@course.route('/student')
+class CourseById(MethodView):
+    @course.response(HTTPStatus.OK, CourseSchema, description='Returns an object containing detail'
+                                                              ' of all offered course')
+    @jwt_required()
+    def get(self):
+        """Get detail of all courses being offered"""
+        student_id = get_jwt_identity()
+        course_data = Record.query.filter_by(student_id=student_id).all()
+
+        # check if user requested course data exist
+        if course_data is not None:
+            result = []
+            for courses in course_data:
+                course_detail = Course.query.filter_by(course_id=courses.course_id).first()
+                result_dict = {
+                    'course_id': course_detail.course_id,
+                    'name': course_detail.name,
+                    'teacher': course_detail.teacher,
+                    'credit': course_detail.credit
+                }
+                result.append(result_dict)
+            return jsonify(result), HTTPStatus.CREATED
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='You have not been registered for any course')
