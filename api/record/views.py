@@ -123,3 +123,37 @@ class StudentCourseScoreById(MethodView):
                 abort(HTTPStatus.NOT_FOUND, message='Course does not exist')
         else:
             abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
+
+    @record.response(HTTPStatus.OK, ScoreArgsSchema, description='Returns an object containing'
+                                                                 ' students score in a course')
+    @admin_required()
+    def get(self, course_id, student_id):
+        """Get a specified students score for a specified course"""
+        course_exist = Course.query.filter_by(course_id=course_id).first()
+
+        if course_exist:
+            score = Record.query.filter_by(course_id=course_id, student_id=student_id).first()
+            if score is not None:
+                student_data = User.query.filter_by(user_id=student_id).first()
+                result = []
+                if score.score is Null:
+                    score_val = "The student hasn't been scored yet"
+                    grade_val = "The student hasn't been graded yet"
+                else:
+                    score_val = score.score
+                    grade_val = letter_grade(score.score)
+
+                result_dict = {'name': course_exist.name,
+                               'firstname': student_data.firstname,
+                               'lastname': student_data.lastname,
+                               'matric_no': student_data.matric_no,
+                               'score': score_val,
+                               'grade': grade_val
+                               }
+
+                result.append(result_dict)
+                return jsonify(result), HTTPStatus.OK
+            else:
+                abort(HTTPStatus.NOT_FOUND, message='The student has not been registered for this course')
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='Course does not exist')
