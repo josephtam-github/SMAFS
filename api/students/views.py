@@ -83,7 +83,7 @@ class ListStudent(MethodView):
         if student_data is not None:
             return student_data, HTTPStatus.OK
         else:
-            abort(HTTPStatus.NO_CONTENT, message='There are currently no students')
+            abort(HTTPStatus.NOT_FOUND, message='There are currently no students')
 
 
 # Student resource - This is for students to perform CRUD operations on their accounts
