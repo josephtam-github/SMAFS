@@ -19,6 +19,7 @@ course = Blueprint(
 )
 
 
+# Admin resources
 @course.route('/register')
 class Register(MethodView):
     @course.arguments(CourseSchema)
@@ -84,21 +85,6 @@ class CourseById(MethodView):
             abort(HTTPStatus.NOT_FOUND, message='course does not exist')
 
 
-@course.route('/all')
-class ListCourse(MethodView):
-    @course.response(HTTPStatus.OK, CourseSchema(many=True), description='Returns an object containing all course data')
-    def get(self):
-        """Get a list of all courses"""
-        course_data = Course.query.all()
-
-        # check if user requested course exist
-        if course_data is not None:
-            return course_data, HTTPStatus.OK
-        else:
-            abort(HTTPStatus.NO_CONTENT, message='There are currently no courses')
-
-
-# Admin resource - Only an admin can register other students
 @course.route('/<int:course_id>/')
 @course.route('/<int:course_id>/<int:student_id>')
 class StudentCourseById(MethodView):
@@ -127,3 +113,19 @@ class StudentCourseById(MethodView):
                 abort(HTTPStatus.NOT_FOUND, message='Course does not exist')
         else:
             abort(HTTPStatus.NOT_FOUND, message='Student does not exist')
+
+
+# Student resources
+@course.route('/all')
+class ListCourse(MethodView):
+    @course.response(HTTPStatus.OK, CourseSchema(many=True), description='Returns an object containing all course data')
+    @jwt_required()
+    def get(self):
+        """Get a list of all courses"""
+        course_data = Course.query.all()
+
+        # check if user requested course exist
+        if course_data is not None:
+            return course_data, HTTPStatus.OK
+        else:
+            abort(HTTPStatus.NOT_FOUND, message='There are currently no courses')
