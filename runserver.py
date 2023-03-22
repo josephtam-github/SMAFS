@@ -1,9 +1,12 @@
-from api import create_app, db
-from api.config.config import config_dict
+from flask import Flask
 
-app = create_app(config=config_dict['prod'])
+app = Flask(__name__)
 
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        app.run(debug=True)
+
+@app.route('/')
+def hello_world():  # put application's code here
+    return 'Hello World!'
+
+
+if __name__ == '__main__':
+    app.run()
