@@ -54,7 +54,7 @@
 ---
 
 <!-- About the Project -->
-## About Ze School
+## About SMAFS
 
 SMAFS is an API built with Flask-Smorest, designed to facilitate account registration and student data management for school admin on a web application powered by PythonAnywhere. The API provides capabilities to Create, Read, Update, and Delete student data, and features a user-friendly Swagger UI that makes testing and front-end integration easy.
 
@@ -158,7 +158,7 @@ To use this API, follow these steps:
 
 <br>
 
-[![SMAFS Posterman][SMAFS-screenshot]](https://github.com/josephtam-github/SMAFS/blob/main/images/Posterman.png)
+[![SMAFS Posterman][SMAFS-screenshot2]](https://github.com/josephtam-github/SMAFS/blob/main/images/Posterman.png)
 
 <br>
 
